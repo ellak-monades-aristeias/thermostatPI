@@ -1,3 +1,7 @@
+# Connections
+
+Connect the temperature sensors and the relay as show in the [image](schematic.png)
+
 # Update
 
     sudo apt-get update
@@ -19,7 +23,7 @@
     sudo apt-get -y install mysql-server mysql-client python-mysqldb
     mysql -u root -p
 
-Inside the mysql shell, copy and paste the code form the file [[create_tables.sql]].
+Inside the mysql shell, copy and paste the code form the file [create_tables.sql](create_tables.sql).
 
 # Install php and apache
 
