@@ -12,7 +12,7 @@ What is needed:
 * 2 * 4.7K resistance
 * 1 * usb wifi
 * cables
-* 
+
 # Software
 
 The project uses the following software:
