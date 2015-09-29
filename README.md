@@ -24,7 +24,13 @@ The project uses the following software:
 
 # Architecture
 
-TODO
+The main program of the thermostat is a python script that reads the temperature measurements (every one minute).
+After reading these measurments, it decides if it must be activated or deactivated.
+The threshold that are used are read from the database.
+Moreover, the temparature along with the status (on-off) is stored in the database.
+
+The configuration of the thermostat is done through a web interface that is writen in php.
+The web interfase provides also the history of the temperature and the operation hours.
 
 # Installation
 
