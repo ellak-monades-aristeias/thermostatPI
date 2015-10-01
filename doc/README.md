@@ -1,3 +1,22 @@
+# Software
+
+The project uses the following software:
+
+* Python
+* Apache
+* Mysql
+* Php
+
+# Architecture
+
+The main program of the thermostat is a python script that reads the temperature measurements (every one minute).
+After reading these measurments, it decides if it must be activated or deactivated.
+The threshold that are used are read from the database.
+Moreover, the temparature along with the status (on-off) is stored in the database.
+
+The configuration of the thermostat is done through a web interface that is writen in php.
+The web interfase provides also the history of the temperature and the operation hours.
+
 # Connections
 
 Connect the temperature sensors and the relay as show in the [image](schematic.png).
@@ -56,4 +75,13 @@ So we must install these packages:
 
 # ThermostatPi configuration
 
-TODO
+Copy the file `src/opt/thermostatPi/thermostatPi.py` to the file: `/opt/thermostatPi/thermostatPi.py`:
+
+    mkdir -p /opt/thermostatPi/
+    cp src/opt/thermostatPi/thermostatPi.py /opt/thermostatPi/thermostatPi.py
+
+In order to start the script on boot time, add the following linei to `/etc/rc.local<:
+
+    python /opt/thermostatPi/thermostatPi.py 2>&1 > /var/log/traficLightServer.log &
+
+TODO: web interface instructions.
