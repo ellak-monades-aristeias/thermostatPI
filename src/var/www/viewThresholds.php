@@ -54,6 +54,56 @@
       <input type="hidden" name="passU" value="<?php echo $passU; ?>" />
       <input type="submit" name="submit" value="Go to configuration page."/>
     </form>
+    
+    <?php
+      //Display the hours that have been set until now.
+      try {
+        $db = new PDO('mysql:dbname='.$dbname.';host='.$host.';port='.$port, $user, $pass);
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $sql = "SELECT * FROM `thresholds` ORDER BY `day`, `hour`, `minute`;";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+        
+        echo "<table>";
+        echo "<tr> <td>Day</td> <td>Hour</td> <td>Minute</td> <td>LowerIn</td> <td>UpperIn</td> <td>LowerOut</td> <td>UpperOut</td> </tr>"
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+          $day    = $fow['day'];
+          $hour   = $row['hour'];
+          $minute = $row['minute'];
+          $lowerThresholdIn  = $row['lowerThresholdIn'];
+          $upperThresholdIn  = $row['upperThresholdIn'];
+          $lowerThresholdOut = $row['lowerThresholdOut'];
+          $upperThresholdOut = $row['upperThresholdOut'];
+          echo "<tr>";
+          echo "<td> $day </td>";
+          echo "<td> $hour </td>";
+          echo "<td> $minute </td>";
+          echo "<td> $lowerThresholdIn </td>";
+          echo "<td> $upperThresholdIn </td>";
+          echo "<td> $lowerThresholdOut </td>";
+          echo "<td> $upperThresholdOut </td>";
+          echo "</tr>";
+        }
+        echo "</table>";
+      } catch (PDOException $e) {
+        echo 'Error in sql: ' . $e->getMessage();
+      }
+      //Close connection.
+      $dbh = null;
+    ?>
   </body>
 </html>
 
+            <tr>
+              <td>UserId: </td>
+              <td><input type="text" name="userU"></td>
+            </tr>
+            <tr>
+              <td>Password: </td>
+              <td><input type="text" name="passU"></td>
+            </tr>
+            <tr>
+              <td> <input type="submit" name="submit1" value="Login"/> </td>
+              <td></td>
+            </tr>
+          
