@@ -55,21 +55,21 @@
     ?>
 
     <?php
-      //Check if we must delete something.
-      if (isset($_GET["delete"]) && $_GET["delete"]=="true" && isset($_GET["day"]) && isset($_GET["hour"]) && isset($_GET["minute"]) ) {
-        $day =    $_GET["day"];
-        $hour =   $_GET["hour"];
-        $minute = $_GET["minute"];
+      //Check if we must delete something. As the timestamps can not overlap, use only the start time.
+      if (isset($_GET["delete"]) && $_GET["delete"]=="true" && isset($_GET["startDay"]) && isset($_GET["startHour"]) && isset($_GET["startMinute"]) ) {
+        $startDay =    $_GET["startDay"];
+        $startHour =   $_GET["startHour"];
+        $startMinute = $_GET["startMinute"];
         
         try {
           $db = new PDO('mysql:dbname='.$dbname.';host='.$host.';port='.$port, $user, $pass);
           $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-          $sql = "DELETE FROM `thresholds` WHERE `day`=:day AND `hour`=:hour AND `minute`=:minute";
+          $sql = "DELETE FROM `thresholds` WHERE `startDay`=:startDay AND `startHour`=:startHour AND `startMinute`=:startMinute";
           $stmt = $db->prepare($sql);
-          $stmt->bindParam(':day',    $day);
-          $stmt->bindParam(':hour',   $hour);
-          $stmt->bindParam(':minute', $minute);
+          $stmt->bindParam(':startDay',    $startDay);
+          $stmt->bindParam(':startHour',   $startHour);
+          $stmt->bindParam(':startMinute', $startMinute);
           $stmt->execute();
         } catch (PDOException $e) {
           echo 'Error in sql: ' . $e->getMessage();
@@ -79,31 +79,43 @@
       }
 
       //Check if we must insert something.
-      $day      = NULL;
-      $hour     = NULL;
-      $minute   = NULL;
+      $startDay      = NULL;
+      $startHour     = NULL;
+      $startMinute   = NULL;
+      $endDay      = NULL;
+      $endHour     = NULL;
+      $endMinute   = NULL;
       $lowerin  = NULL;
       $upperin  = NULL;
       $lowerout = NULL;
       $upperout = NULL;
       //Check if a new threshold was submited.
-      if (isset($_POST["day"]) && isset($_POST["hour"]) && isset($_POST["minute"]) && isset($_POST["lowerin"]) && isset($_POST["upperin"]) && isset($_POST["lowerout"]) && isset($_POST["upperout"]) ) {
-        $day      = intval($_POST["day"]);
-        $hour     = intval($_POST["hour"]);
-        $minute   = intval($_POST["minute"]);
+      if (isset($_POST["startDay"]) && isset($_POST["startHour"]) && isset($_POST["startMinute"]) && isset($_POST["endDay"]) && isset($_POST["endHour"]) && isset($_POST["endMinute"]) && isset($_POST["lowerin"]) && isset($_POST["upperin"]) && isset($_POST["lowerout"]) && isset($_POST["upperout"]) ) {
+        $startDay      = intval($_POST["startDay"]);
+        $startHour     = intval($_POST["startHour"]);
+        $startMinute   = intval($_POST["startMinute"]);
+        $endDay      = intval($_POST["endDay"]);
+        $endHour     = intval($_POST["endHour"]);
+        $endMinute   = intval($_POST["endMinute"]);
         $lowerin  = floatval($_POST["lowerin"]);
         $upperin  = floatval($_POST["upperin"]);
         $lowerout = floatval($_POST["lowerout"]);
         $upperout = floatval($_POST["upperout"]);
         
-        if($_POST["day"]=="" || $_POST["hour"]=="" || $_POST["minute"]=="" || $_POST["lowerin"]=="" || $_POST["upperin"]=="" || $_POST["lowerout"]=="" || $_POST["upperout"]=="") {
+        if($_POST["startDay"]=="" || $_POST["startHour"]=="" || $_POST["startMinute"]=="" || $_POST["endDay"]=="" || $_POST["endHour"]=="" || $_POST["endMinute"]=="" || $_POST["lowerin"]=="" || $_POST["upperin"]=="" || $_POST["lowerout"]=="" || $_POST["upperout"]=="") {
           echo "<h2> Some values were not in the correct format, please check them.</h2>";
-        } else if($day<0 || $day>6) {
-          echo "<h2> day must be an integer between 0 and 6.</h2>";
-        } else if ($hour<0 || $hour>23) {
-          echo "<h2> hour must be an integer between 0 and 23.</h2>";
-        } else if ($minute<0 || $minute>23) {
-          echo "<h2> minute must be an integer between 0 and 59.</h2>";
+        } else if($startDay<0 || $startDay>6) {
+          echo "<h2> Start day must be an integer between 0 and 6.</h2>";
+        } else if ($startHour<0 || $startHour>23) {
+          echo "<h2> Start hour must be an integer between 0 and 23.</h2>";
+        } else if ($startMinute<0 || $startMinute>59) {
+          echo "<h2> Start minute must be an integer between 0 and 59.</h2>";
+        } else if($endDay<0 || $endDay>6) {
+          echo "<h2> End day must be an integer between 0 and 6.</h2>";
+        } else if ($endHour<0 || $endHour>23) {
+          echo "<h2> End hour must be an integer between 0 and 23.</h2>";
+        } else if ($endMinute<0 || $endMinute>59) {
+          echo "<h2> End minute must be an integer between 0 and 59.</h2>";
         } else {
           //Values are ok.
         
@@ -112,11 +124,14 @@
             $db = new PDO('mysql:dbname='.$dbname.';host='.$host.';port='.$port, $user, $pass);
             $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            $sql = "INSERT INTO `thresholds`(`day`, `hour`, `minute`, `lowerThresholdIn`, `upperThresholdIn`, `lowerThresholdOut`, `upperThresholdOut`) VALUES (:day, :hour, :minute, :lowerThresholdIn, :upperThresholdIn, :lowerThresholdOut, :upperThresholdOut)";
+            $sql = "INSERT INTO `thresholds`(`startDay`, `startHour`, `startMinute`, `endDay`, `endHour`, `endMinute`, `lowerThresholdIn`, `upperThresholdIn`, `lowerThresholdOut`, `upperThresholdOut`) VALUES (:startDay, :startHour, :startMinute, :endDay, :endHour, :endMinute, :lowerThresholdIn, :upperThresholdIn, :lowerThresholdOut, :upperThresholdOut)";
             $stmt = $db->prepare($sql);
-            $stmt->bindParam(':day',    $day);
-            $stmt->bindParam(':hour',   $hour);
-            $stmt->bindParam(':minute', $minute);
+            $stmt->bindParam(':startDay',    $startDay);
+            $stmt->bindParam(':startHour',   $startHour);
+            $stmt->bindParam(':startMinute', $startMinute);
+            $stmt->bindParam(':endDay',    $endDay);
+            $stmt->bindParam(':endHour',   $endHour);
+            $stmt->bindParam(':endMinute', $endMinute);
             $stmt->bindParam(':lowerThresholdIn',  $lowerin);
             $stmt->bindParam(':upperThresholdIn',  $upperin);
             $stmt->bindParam(':lowerThresholdOut', $lowerout);
@@ -124,9 +139,12 @@
             $stmt->execute();
             
             //If executed sucessfully, do not show them on the input fields.
-            $day      = NULL;
-            $hour     = NULL;
-            $minute   = NULL;
+            $startDay      = NULL;
+            $startHour     = NULL;
+            $startMinute   = NULL;
+            $endDay      = NULL;
+            $endHour     = NULL;
+            $endMinute   = NULL;
             $lowerin  = NULL;
             $upperin  = NULL;
             $lowerout = NULL;
@@ -149,9 +167,12 @@
     <form method="POST" action="">
       <table>
         <tr>
-          <td>Day</td>
-          <td>Hour</td>
-          <td>Minute</td>
+          <td>StartDay</td>
+          <td>StartHour</td>
+          <td>StartMinute</td>
+          <td>EndDay</td>
+          <td>EndHour</td>
+          <td>EndMinute</td>
           <td>LowerIn</td>
           <td>UpperIn</td>
           <td>LowerOut</td>
@@ -159,9 +180,12 @@
           <td> </td>
         </tr>
         <tr>
-          <td> <input type="text" name="day"      value="<?php echo $day; ?>"> </td>
-          <td> <input type="text" name="hour"     value="<?php echo $hour; ?>"> </td>
-          <td> <input type="text" name="minute"   value="<?php echo $minute; ?>"> </td>
+          <td> <input type="text" name="startDay"      value="<?php echo $startDay; ?>"> </td>
+          <td> <input type="text" name="startHour"     value="<?php echo $startHour; ?>"> </td>
+          <td> <input type="text" name="startMinute"   value="<?php echo $startMinute; ?>"> </td>
+          <td> <input type="text" name="endDay"      value="<?php echo $endDay; ?>"> </td>
+          <td> <input type="text" name="endHour"     value="<?php echo $endHour; ?>"> </td>
+          <td> <input type="text" name="endMinute"   value="<?php echo $endMinute; ?>"> </td>
           <td> <input type="text" name="lowerin"  value="<?php echo $lowerin; ?>"> </td>
           <td> <input type="text" name="upperin"  value="<?php echo $upperin; ?>"> </td>
           <td> <input type="text" name="lowerout" value="<?php echo $lowerin; ?>"> </td>
@@ -171,31 +195,50 @@
         
     <?php
       //Display the hours that have been set until now.
+      $drawJavascriptString = "";
       try {
         $db = new PDO('mysql:dbname='.$dbname.';host='.$host.';port='.$port, $user, $pass);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $sql = "SELECT * FROM `thresholds` ORDER BY `day`, `hour`, `minute`;";
+        $sql = "SELECT * FROM `thresholds` ORDER BY `startDay`, `startHour`, `startMinute`;";
         $stmt = $db->prepare($sql);
         $stmt->execute();
         
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-          $day    = $row['day'];
-          $hour   = $row['hour'];
-          $minute = $row['minute'];
+          $startDay    = $row['startDay'];
+          $startHour   = $row['startHour'];
+          $startMinute = $row['startMinute'];
+          $endDay    = $row['endDay'];
+          $endHour   = $row['endHour'];
+          $endMinute = $row['endMinute'];
           $lowerThresholdIn  = $row['lowerThresholdIn'];
           $upperThresholdIn  = $row['upperThresholdIn'];
           $lowerThresholdOut = $row['lowerThresholdOut'];
           $upperThresholdOut = $row['upperThresholdOut'];
           echo "<tr>";
-          echo "<td> $day </td>";
-          echo "<td> $hour </td>";
-          echo "<td> $minute </td>";
+          echo "<td> $startDay </td>";
+          echo "<td> $startHour </td>";
+          echo "<td> $startMinute </td>";
+          echo "<td> $endDay </td>";
+          echo "<td> $endHour </td>";
+          echo "<td> $endMinute </td>";
           echo "<td> $lowerThresholdIn </td>";
           echo "<td> $upperThresholdIn </td>";
           echo "<td> $lowerThresholdOut </td>";
           echo "<td> $upperThresholdOut </td>";
-          echo "<td> <a href='viewThresholds.php?userU=$userU&passU=$passU&delete=true&day=$day&hour=$hour&minute=$minute'> Delete </a> </td>";
+          echo "<td> <a href='viewThresholds.php?userU=$userU&passU=$passU&delete=true&startDay=$startDay&startHour=$startHour&startMinute=$startMinute'> Delete </a> </td>";
           echo "</tr>";
+          while($startDay != $endDay) {
+            $startTime = $startDay*24*60 + $startHour*60 + $startMinute;
+            $drawJavascriptString .= "ctx.fillRect($startHour*60 + $startMinute + leftOffset, 10*$startDay + topOffset, (24*60) - $startHour*60 + $startMinute, 9);";
+            $startDay++;
+            $startHour   = 0;
+            $startMinute = 0;
+          }
+          //The start and end days are the same.
+          $startTime = $startHour*60 + $startMinute;
+          $endTime   = $endHour*60   + $endMinute;
+          $timeDiffInMinutes = $endTime - $startTime;
+          $drawJavascriptString .= "ctx.fillRect($startTime + leftOffset, 10*$startDay + topOffset, $timeDiffInMinutes, 9);";
         }
       } catch (PDOException $e) {
         echo 'Error in sql: ' . $e->getMessage();
@@ -233,24 +276,34 @@
       ctx.fillText("Saturday",  0, 70);
       ctx.fillText("Sunday",    0, 80);
       
+      //Draw the rectangles gray.
+      ctx.fillStyle="#CCCCCC";
+      var graphWidth = 24 * 60 - 1;
+      for (var i=0; i<7; i++) {
+        ctx.fillRect(leftOffset, i*10 + topOffset, graphWidth, 9);
+      }
+
+      //Draw the times which have the thermostat open as gree.
+      ctx.fillStyle="#00FF00";
+      <?php echo $drawJavascriptString; ?>
+     /* 
       //Draw green when on, gray when off.
       for(var i=0; i<7; i++) {
         for(var j=0; j<24; j++) {
           for(var k=0; k<60; k++) {
             if(k<30) {
               ctx.strokeStyle="#0000FF";
-            } else {
-              ctx.strokeStyle="#FF0000";
+              ctx.beginPath();
+              ctx.moveTo(j*60+k+leftOffset, i*10+topOffset);
+              ctx.lineTo(j*60+k+leftOffset, (i+1)*10-1+topOffset);
+              ctx.closePath();
+              ctx.stroke();
             }
-            ctx.beginPath();
-            ctx.moveTo(j*60+k+leftOffset, i*10+topOffset);
-            ctx.lineTo(j*60+k+leftOffset, (i+1)*10-1+topOffset);
-            ctx.closePath();
-            ctx.stroke();
           }
         }
       }
-      
+     */
+       
     </script>
   </body>
 </html>
