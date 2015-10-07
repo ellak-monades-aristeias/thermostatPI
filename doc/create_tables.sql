@@ -24,9 +24,7 @@ CREATE TABLE IF NOT EXISTS `thresholds` (
   `endMinute` INT NOT NULL,
   -- The lower and upper thresholds for the inner and outer sensor.
   `lowerThresholdIn` DECIMAL(6,2) NOT NULL,
-  `upperThresholdIn` DECIMAL(6,2) NOT NULL,
-  `lowerThresholdOut` DECIMAL(6,2) NOT NULL,
-  `upperThresholdOut` DECIMAL(6,2) NOT NULL
+  `upperThresholdIn` DECIMAL(6,2) NOT NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS `config` (
@@ -45,11 +43,16 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS `check_thresholds_before_insert`$$
 CREATE PROCEDURE `check_thresholds_before_insert`(
 IN `startDayIn` INT, IN `startHourIn` INT, IN `startMinuteIn` INT,
-IN `endDayIn` INT,  IN `endHourIn` INT,  IN `endMinuteIn` INT
+IN `endDayIn` INT,  IN `endHourIn` INT,  IN `endMinuteIn` INT,
+IN `lowerThresholdInIn` DECIMAL(6,2), IN `upperThresholdInIn` DECIMAL(6,2)
 )
 READS SQL DATA
 BEGIN
   DECLARE `num_rows` INT;
+  
+  if `lowerThresholdInIn` > `upperThresholdInIn` THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "ERROR: Lower threshold must not be greater than the upper threshold.";
+  END IF;
   
   if `endDayIn`*24*60+`endHourIn`*60+`endMinuteIn` <= `startDayIn`*24*60+`startHourIn`*60+`startMinuteIn` THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "ERROR: Start time must be after end time.";
@@ -107,7 +110,8 @@ CREATE TRIGGER `before_thresholds_insert`
 BEGIN
   CALL `check_thresholds_before_insert`(
 NEW.`startDay`, NEW.`startHour`, NEW.`startMinute`,
-NEW.`endDay`, NEW.`endHour`, NEW.`endMinute`);
+NEW.`endDay`, NEW.`endHour`, NEW.`endMinute`,
+NEW.`lowerThresholdIn`, NEW.`upperThresholdIn`);
 END$$
 DELIMITER ;
 
@@ -119,7 +123,8 @@ CREATE TRIGGER `before_thresholds_update`
 BEGIN
   CALL `check_thresholds_before_insert`(
 NEW.`startDay`, NEW.`startHour`, NEW.`startMinute`,
-NEW.`endDay`, NEW.`endHour`, NEW.`endMinute`);
+NEW.`endDay`, NEW.`endHour`, NEW.`endMinute`,
+NEW.`lowerThresholdIn`, NEW.`upperThresholdIn`);
 END$$
 DELIMITER ;
 
