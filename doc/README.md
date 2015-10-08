@@ -85,3 +85,7 @@ In order to start the script on boot time, add the following linei to `/etc/rc.l
     python /opt/thermostatPi/thermostatPi.py 2>&1 > /var/log/traficLightServer.log &
 
 TODO: web interface instructions.
+
+# Setup an adhoc wifi access point
+
+Follow the instructions [CreateAccessPoint.md](CreateAccessPoint.md)
