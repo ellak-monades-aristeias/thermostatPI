@@ -73,19 +73,29 @@ So we must install these packages:
     sudo a2enmod auth_mysql
     sudo service apache2 restart
 
-# ThermostatPi configuration
+# Files configuration
 
 Copy the file `src/opt/thermostatPi/thermostatPi.py` to the file: `/opt/thermostatPi/thermostatPi.py`:
 
     mkdir -p /opt/thermostatPi/
     cp src/opt/thermostatPi/thermostatPi.py /opt/thermostatPi/thermostatPi.py
 
-In order to start the script on boot time, add the following linei to `/etc/rc.local<:
+In order to start the script on boot time, add the following linei to `/etc/rc.local:
 
     python /opt/thermostatPi/thermostatPi.py 2>&1 > /var/log/traficLightServer.log &
 
-TODO: web interface instructions.
+Copy the files that are responsible for the web interface:
+
+    cp src/var/www/* /var/www/
 
 # Setup an adhoc wifi access point
 
 Follow the instructions [CreateAccessPoint.md](CreateAccessPoint.md)
+
+# Configuration through web interface.
+
+Assuming that you have connect to the wifi of the raspberry, then the ip of the raspberry will be `10.0.0.254`.
+
+Open a browser and go to the addres: `10.0.0.254/thermostatConfiguration.php`. The default username is `user` and the password is `pass`.
+
+
