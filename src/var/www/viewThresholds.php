@@ -221,7 +221,7 @@
           //The start and end days are the same.
           $startTime = $startHour*60 + $startMinute;
           $endTime   = $endHour*60   + $endMinute;
-          $timeDiffInMinutes = $endTime - $startTime;
+          $timeDiffInMinutes = $endTime - $startTime + 1; //We want the last minute.
           $drawJavascriptString .= "ctx.fillRect($startTime + leftOffset, 10*$startDay + topOffset, $timeDiffInMinutes, 9);";
         }
       } catch (PDOException $e) {
@@ -262,7 +262,7 @@
       
       //Draw the rectangles gray.
       ctx.fillStyle="#CCCCCC";
-      var graphWidth = 24 * 60 - 1;
+      var graphWidth = 24 * 60;
       for (var i=0; i<7; i++) {
         ctx.fillRect(leftOffset, i*10 + topOffset, graphWidth, 9);
       }

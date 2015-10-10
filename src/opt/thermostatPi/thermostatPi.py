@@ -10,8 +10,6 @@ import RPi.GPIO as GPIO
 
 #Some settings.
 mysqlPass = "raspberry"
-temperatureLowerThreshold = 20.00
-temperatureUpperThreshold = 22.00
 
 #The GPIO name of the pins.
 outputPin = 17
@@ -36,50 +34,83 @@ db = MySQLdb.connect(host="localhost", user="root", passwd=mysqlPass, db="thermo
 try:
   hasBeenAboveTemperatureUpperThreshold = False
   while True:
-    # Read the temperature and the humidity.
+    #Keep the time.
     a = datetime.now()
+    
+    # Get the threshold from the database.
+    temperatureLowerThreshold = None
+    temperatureUpperThreshold = None
+    cursor = db.cursor()
+    try:
+      now = datetime.today()
+      day = now.weekday()
+      hour = now.hour
+      minute = now.minute
+      print("Day=%d, hour=%d, minute=%d" % (day, hour, minute))
+      myTimestamp = day*24*60 + hour*60 + minute;
+      query = """SELECT `lowerThresholdIn`, `upperThresholdIn` FROM `thresholds` WHERE `startDay`*24*60+`startHour`*60+`startMinute` <= %s AND %s <= `endDay`*24*60+`endHour`*60+`endMinute`""";
+      cursor.execute(query, (myTimestamp, myTimestamp))
+      for (temperatureLowerThreshold, temperatureUpperThreshold) in cursor:
+        print("Found thresholds: lower=%.1f, upper=%.1f" % (temperatureLowerThreshold, temperatureUpperThreshold))
+    except:
+      db.rollback()
+      ex_type, ex, tb = sys.exc_info()
+      traceback.print_tb(tb)
+      print(ex)
+    cursor.close()
+    
+    # Read the temperature and the humidity.
     h1,t1 = DHT.read_retry(DHT.DHT22, sensor1Pin)
     h2,t2 = DHT.read_retry(DHT.DHT22, sensor1Pin)
-    print 'Temp={0:1.1f}*C Humidity={1:0.1f}%'.format(t1,h1)
-    print 'Temp={0:1.1f}*C Humidity={1:0.1f}%'.format(t2,h2)
-    
+    print("In:  Temp=%.1f*C Humidity=%.1f%%" % (t1,h1))
+    print("Out: Temp=%.1f*C Humidity=%.1f%%" % (t2,h2))
+   
     #If the current temperature is higher than the temperatureUpperThreshold, then power off.
     status = False
-    if temperatureUpperThreshold < t1:
-      status = False
-      hasBeenAboveTemperatureUpperThreshold = True
-    #If the current temperature is lower than the temperatureLowerThreshold, then power on.
-    elif t1<temperatureLowerThreshold:
-      status = True
-      hasBeenAboveTemperatureUpperThreshold = False
-    #The temperature is between the temperatureLowerThreshold and temperatureUpperThreshold.
-    else:
-      #It was hot, and now the temperature is falling. Wait until it is bellow temperatureLowerThreshold.
-      if hasBeenAboveTemperatureUpperThreshold:
+    if temperatureLowerThreshold is not None and temperatureUpperThreshold is not None:
+      if temperatureUpperThreshold < t1:
         status = False
-      #The temperature was bellow temperatureLowerThreshold, now it is above temperatureLowerThreshold, but it has not yet reach temperatureUpperThreshold.
-      else:
+        hasBeenAboveTemperatureUpperThreshold = True
+        print("Temperature above upper limit. Status=Off.")
+      #If the current temperature is lower than the temperatureLowerThreshold, then power on.
+      elif t1<temperatureLowerThreshold:
         status = True
+        hasBeenAboveTemperatureUpperThreshold = False
+        print("Temperature below lower limit. Status=On.")
+      #The temperature is between the temperatureLowerThreshold and temperatureUpperThreshold.
+      else:
+        #It was hot, and now the temperature is falling. Wait until it is bellow temperatureLowerThreshold.
+        if hasBeenAboveTemperatureUpperThreshold:
+          status = False
+          print("Temperature between limits, but has been above upper limit. Status=Off.")
+        #The temperature was bellow temperatureLowerThreshold, now it is above temperatureLowerThreshold, but it has not yet reach temperatureUpperThreshold.
+        else:
+          status = True
+          print("Temperature between limits, but has been below lower limit. Status = On.")
     
-    #t2 represents the temperature in the outer space, so if it is above t1, do not open the thermostat.
-    if t1 < t2 :
-      status = False
+      #t2 represents the temperature in the outer space, so if it is above t1, do not open the thermostat.
+      #Dht22 have 2-5% accuracy error, so for measurements around 20oC the maximum error is 0.05*20=1oC. We have two sensors, so the combined error can be up to 2oC.
+      if t1 < t2 - 2 :
+        status = False
+        print("Inner temperature is below outer temperature. Status=Off")
+    else:
+      print("No limits has been set. Status=Off.")
     
     #Open or close the thermostat.
     GPIO.output(outputPin, status)
     GPIO.output(outputPin,False)
     
     #Insert the measurments to the database.
-    x = db.cursor()
+    cursor = db.cursor()
     try:
-      x.execute("""INSERT INTO `measurements` (`time`, `temperatureIn`, `temperatureOut`, `status`) VALUES (%s,%s,%s,%s)""",  
-        (time.strftime('%Y-%m-%d %H:%M:%S'), t1, t2, status))
+      query = """INSERT INTO `measurements` (`time`, `temperatureIn`, `temperatureOut`, `status`) VALUES (%s,%s,%s,%s)"""
+      cursor.execute(query, (time.strftime('%Y-%m-%d %H:%M:%S'), t1, t2, status))
       db.commit()
     except:
       db.rollback()
       ex_type, ex, tb = sys.exc_info()
       traceback.print_tb(tb)
-      print ex
+      print(ex)
     
     # Do not wait for the time that the above command consumed.
     b = datetime.now()
@@ -87,7 +118,7 @@ try:
     if timeBetweenMeasurments - c.total_seconds() > 0:
       time.sleep(timeBetweenMeasurments - c.total_seconds())
 except KeyboardInterrupt:
-  print "Exiting..."
+  print("Exiting...")
 
 #Close mysql connection
 db.close()
