@@ -59,6 +59,48 @@ try:
       print(ex)
     cursor.close()
     
+    # Get the limit
+    period         = None
+    maxConsumption = None
+    cursor = db.cursor()
+    try:
+      query = """SELECT `c1`.`value` AS `period`, `c2`.`value` AS `maxConsumption` FROM `config` AS `c1`, `config` AS `c2` WHERE `c1`.`key`='period' AND `c2`.`key`='maxConsumption'""";
+      cursor.execute(query)
+      for (period, maxConsumption) in cursor:
+        maxConsumption = float(maxConsumption)
+        print("Period: %s, max consumption=%.1f" % (period, maxConsumption))
+    except:
+      db.rollback()
+      ex_type, ex, tb = sys.exc_info()
+      traceback.print_tb(tb)
+      print(ex)
+    cursor.close()
+    
+    # Get the limit
+    comsumptionInPeriod = None
+    cursor = db.cursor()
+    try:
+      query = "";
+      if period == "day":
+        query = """SELECT count(*) as `comsumptionInPeriod`  FROM `measurements` WHERE `time` >= DATE_ADD(CURDATE(), INTERVAL -1 DAY) AND `status`=1""";
+      elif period == "week":
+        query = """SELECT count(*) as `comsumptionInPeriod`  FROM `measurements` WHERE `time` >= DATE_ADD(CURDATE(), INTERVAL -1 WEEK) AND `status`=1""";
+      elif period == "month":
+        query = """SELECT count(*) as `comsumptionInPeriod`  FROM `measurements` WHERE `time` >= DATE_ADD(CURDATE(), INTERVAL -1 MONTH) AND `status`=1""";
+      else:
+        print("Period: %s is not supported" % period)
+      cursor.execute(query)
+      for (comsumptionInPeriod) in cursor:
+        #Convert it in hours.
+        comsumptionInPeriod = comsumptionInPeriod[0] / 60.0
+        print("Consumption in period=%.1f" % (comsumptionInPeriod))
+    except:
+      db.rollback()
+      ex_type, ex, tb = sys.exc_info()
+      traceback.print_tb(tb)
+      print(ex)  
+    cursor.close()
+    
     # Read the temperature and the humidity.
     h1,t1 = DHT.read_retry(DHT.DHT22, sensor1Pin)
     h2,t2 = DHT.read_retry(DHT.DHT22, sensor1Pin)
@@ -93,12 +135,14 @@ try:
       if t1 < t2 - 2 :
         status = False
         print("Inner temperature is below outer temperature. Status=Off")
+      if comsumptionInPeriod is not None and maxConsumption is not None and maxConsumption<=comsumptionInPeriod:
+        status = False
+        print("Max consumption has been reached. Status=Off")
     else:
       print("No limits has been set. Status=Off.")
     
     #Open or close the thermostat.
     GPIO.output(outputPin, status)
-    GPIO.output(outputPin,False)
     
     #Insert the measurments to the database.
     cursor = db.cursor()

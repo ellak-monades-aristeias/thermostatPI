@@ -120,7 +120,7 @@
               </td>
             </tr>
             <tr>
-              <td>Max Consumption: </td>
+              <td>Max Consumption (in hours): </td>
               <td><input type="text" name="maxConsumption" value="<?php echo $maxConsumption; ?>"></td>
             </tr>
             <tr>
