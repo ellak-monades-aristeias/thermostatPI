@@ -57,8 +57,91 @@
       <input type="hidden" name="passU" value="<?php echo $passU; ?>" />
       <input type="submit" name="submit" value="Go to configuration page."/>
     </form>
+
+    <table>
     
-    <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+    <?php
+      //Get the measurments.
+      try {
+        $db = new PDO('mysql:dbname='.$dbname.';host='.$host.';port='.$port, $user, $pass);
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $sql = "SELECT count(*) as minutesOn  FROM `measurements` WHERE `time` >= DATE_ADD(CURDATE(), INTERVAL -1 DAY) AND `status`=1";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+
+        $minutesOn = 0;
+        if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+          $minutesOn  = $row['minutesOn'];
+        }
+      } catch (PDOException $e) {
+        echo 'Error in sql: ' . $e->getMessage();
+      }
+      //Close connection.
+      $dbh = null;
+    ?>
+    
+      <tr>
+        <?php $hoursOn   = floor($minutesOn / 60); ?>
+        <?php $minutesOn = $minutesOn % 60; ?>
+        <td>Last day "ON":</td>
+        <td><?php echo "$hoursOn hours and $minutesOn minutes."; ?></td>
+      </tr>
+    
+    <?php
+      //Get the measurments.
+      try {
+        $db = new PDO('mysql:dbname='.$dbname.';host='.$host.';port='.$port, $user, $pass);
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $sql = "SELECT count(*) as minutesOn  FROM `measurements` WHERE `time` >= DATE_ADD(CURDATE(), INTERVAL -1 WEEK) AND `status`=1";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+                                                                                                                           $minutesOn = 0;
+        if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+          $minutesOn  = $row['minutesOn'];
+        }
+      } catch (PDOException $e) {
+        echo 'Error in sql: ' . $e->getMessage();
+      }
+      //Close connection.
+      $dbh = null;
+    ?>
+    
+      <tr>
+        <?php $hoursOn   = floor($minutesOn / 60); ?>
+        <?php $minutesOn = $minutesOn % 60; ?>
+        <td>Last week "ON":</td> 
+        <td><?php echo "$hoursOn hours and $minutesOn minutes."; ?></td>
+      </tr>
+
+    <?php
+      //Get the measurments.
+      try {
+        $db = new PDO('mysql:dbname='.$dbname.';host='.$host.';port='.$port, $user, $pass);
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $sql = "SELECT count(*) as minutesOn  FROM `measurements` WHERE `time` >= DATE_ADD(CURDATE(), INTERVAL -1 MONTH) AND `status`=1";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+
+        $minutesOn = 0;
+        if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+          $minutesOn  = $row['minutesOn'];
+        }
+      } catch (PDOException $e) {
+        echo 'Error in sql: ' . $e->getMessage();
+      }  
+      //Close connection.
+      $dbh = null;
+    ?>
+      
+      <tr>
+        <?php $hoursOn   = floor($minutesOn / 60); ?>
+        <?php $minutesOn = $minutesOn % 60; ?>
+        <td>Last month "ON":</td> 
+        <td><?php echo "$hoursOn hours and $minutesOn minutes."; ?></td>
+      </tr>
+    </table>
+    
+    <div id="chartContainer" style="height: 400px; width: 100%;"></div>
     
     <?php
       //Get the measurments.
