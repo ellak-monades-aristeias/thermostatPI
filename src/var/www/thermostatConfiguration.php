@@ -72,6 +72,12 @@
       <input type="hidden" name="passU" value="<?php echo $passU; ?>" />
       <input type="submit" name="submit" value="Change Password"/>
     </form>
+    
+    <form method="POST" action="changeMaxConsumption.php">
+      <input type="hidden" name="userU" value="<?php echo $userU; ?>" />
+      <input type="hidden" name="passU" value="<?php echo $passU; ?>" />
+      <input type="submit" name="submit" value="Change Max Consumption"/>
+    </form>
 
     <form method="POST" action="viewThresholds.php">
       <input type="hidden" name="userU" value="<?php echo $userU; ?>" />

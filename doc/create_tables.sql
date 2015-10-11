@@ -37,7 +37,8 @@ CREATE TABLE IF NOT EXISTS `config` (
 
 INSERT INTO `config` (`key`, `value`) VALUES ('username', 'user');
 INSERT INTO `config` (`key`, `value`) VALUES ('password', 'pass');
-INSERT INTO `config` (`key`, `value`) VALUES ('maxHoursPerDay', '25');
+INSERT INTO `config` (`key`, `value`) VALUES ('maxConsumption', '24');
+INSERT INTO `config` (`key`, `value`) VALUES ('period', 'day');
 
 DELIMITER $$
 DROP PROCEDURE IF EXISTS `check_thresholds_before_insert`$$
