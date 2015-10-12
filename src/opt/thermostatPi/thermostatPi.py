@@ -103,7 +103,7 @@ try:
     
     # Read the temperature and the humidity.
     h1,t1 = DHT.read_retry(DHT.DHT22, sensor1Pin)
-    h2,t2 = DHT.read_retry(DHT.DHT22, sensor1Pin)
+    h2,t2 = DHT.read_retry(DHT.DHT22, sensor2Pin)
     print("In:  Temp=%.1f*C Humidity=%.1f%%" % (t1,h1))
     print("Out: Temp=%.1f*C Humidity=%.1f%%" % (t2,h2))
    
