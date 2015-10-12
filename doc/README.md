@@ -10,12 +10,12 @@ The project uses the following software:
 # Architecture
 
 The main program of the thermostat is a python script that reads the temperature measurements (every one minute).
-After reading these measurments, it decides if it must be activated or deactivated.
+After reading these measurements, it decides if it must be activated or deactivated.
 The threshold that are used are read from the database.
-Moreover, the temparature along with the status (on-off) is stored in the database.
+Moreover, the temperature along with the status (on-off) is stored in the database.
 
 The configuration of the thermostat is done through a web interface that is writen in php.
-The web interfase provides also the history of the temperature and the operation hours.
+The web interface provides also the history of the temperature and the operation hours.
 
 # Connections
 
@@ -80,7 +80,7 @@ Copy the file `src/opt/thermostatPi/thermostatPi.py` to the file: `/opt/thermost
     mkdir -p /opt/thermostatPi/
     cp src/opt/thermostatPi/thermostatPi.py /opt/thermostatPi/thermostatPi.py
 
-In order to start the script on boot time, add the following linei to `/etc/rc.local:
+In order to start the script on boot time, add the following linei to `/etc/rc.local`:
 
     python /opt/thermostatPi/thermostatPi.py 2>&1 > /var/log/traficLightServer.log &
 
@@ -96,6 +96,27 @@ Follow the instructions [CreateAccessPoint.md](CreateAccessPoint.md)
 
 Assuming that you have connect to the wifi of the raspberry, then the ip of the raspberry will be `10.0.0.254`.
 
-Open a browser and go to the addres: `10.0.0.254/thermostatConfiguration.php`. The default username is `user` and the password is `pass`.
+Open a browser and go to the address: `10.0.0.254/thermostatConfiguration.php`. The default username is `user` and the password is `pass`.
 
+The web page offers the following options:
+
+*  Change the password.
+*  Change the maximum consumption (per day, per week or per month).
+*  Change the thresholds that the thermostat will be activated.
+*  View total consumption for the last day, week and month or a graph with the temperatures and the consumption through time.
+
+# More on thresholds
+
+The thermostat has two threshold for the inner sensor, which will called lower and upper threshold.
+* When the temperature is below the lower threshold, it is activated.
+* When the temperature is above the upper threshold, it is deactivated.
+* When the temperature is between the lower and upper thresholds:
+*   If the temperature before entering the interval [lower, upper] was bellow the lower threshold, then the temperature is activated. This is the cas, when the temperature was below the lower threshold, the thermostat was activated, the temperature increases but it has not yet reach the upper threshold.
+*   Otherwise, it is deactivated. This is the case when the temperature was above the upper threshold, it started decriasing, but it has not yet reached the lower threshold.
+
+Each threshold can be se different for different times of week. The week is considert to start on day 0 (Monday) and end on day 6 (sunday). The hours have values between 0 and 23. The minutes have values between 0 and 59.
+
+Some other check that affect the thermostat activation are:
+* If the sensor that is placed in the outer environment gives temperature measurements that are above the inhouse sensor, then it is deactivated.
+* If the total consumtion for the last day, week or month exeeds the maximum comsumption for that period, it is deactivated.
 
