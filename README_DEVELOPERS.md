@@ -17,6 +17,10 @@ Moreover, the temperature along with the status (on-off) is stored in the databa
 The configuration of the thermostat is done through a web interface that is writen in php.
 The web interface provides also the history of the temperature and the operation hours.
 
+# Installation
+
+The installation instructions can be found in the doc folder: [doc/README.md](doc/README.md)
+
 # Instructions
 
 In order to download the source code, run:
