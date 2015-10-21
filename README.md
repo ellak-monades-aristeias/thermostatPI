@@ -40,7 +40,6 @@ See: [LICENSE](LICENSE)
 | 6 | Δυνατότητα 4 | https://github.com/ellak-monades-aristeias/thermostatPI/blob/master/src/var/www/viewConsumption.php |
 | 7 | Δυνατότητα 5 | https://github.com/ellak-monades-aristeias/thermostatPI/blob/master/src/opt/thermostatPi/thermostatPi.py |
 | 8 | Δυνατότητα 6 | https://github.com/ellak-monades-aristeias/thermostatPI/blob/master/src/var/www/changeMaxConsumption.php |
-|----|----|----|
 
 Δυνατότητες:
 
