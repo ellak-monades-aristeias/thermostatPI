@@ -1,3 +1,14 @@
+# Hardware
+
+What is needed:
+
+* 1 * Raspberry pi
+* 2 * [DHT22 sensors](https://www.adafruit.com/products/385)
+* 1 * [relay](https://www.sparkfun.com/products/11042)
+* 2 * 4.7K resistance
+* 1 * usb wifi
+* cables
+
 # Connections
 
 Connect the temperature sensors and the relay as show in the [image](doc/schematic.png).
