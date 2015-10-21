@@ -7,6 +7,9 @@ The other measures the outer temperature of the house.
 If the outer is above the inner, then the thermostat is not activated.
 The temperature thresholds that the thermostat is activated are configured through a web interface
 Moreover, the user can se the consumption in hours and set an upper limit per day.
+
+Documentation for [users](README_USERS.md)
+Documentation for [developers](README_DEVELOPERS.md)
  
 # Installation
 
