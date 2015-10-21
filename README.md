@@ -33,8 +33,7 @@ See: [LICENSE](LICENSE)
 | Παραδοτέο | Σύντομη περιγραφή | URL |
 |-----------|-------------------|-----|
 | 1 | Αγορά υλικού: Raspberry pi, αισθητήρες θερμοκρασίας, ρελέ, κεραία ασύρματου δικτύου. | https://github.com/ellak-monades-aristeias/thermostatPI/blob/master/README.md |
-| 2 | Δυνατότητα 7 | https://github.com/ellak-monades-aristeias/thermostatPI/blob/master/doc/CreateAccessPoint.md, 
-https://github.com/ellak-monades-aristeias/thermostatPI/blob/master/doc/README.md |
+| 2 | Δυνατότητα 7 | https://github.com/ellak-monades-aristeias/thermostatPI/blob/master/doc/CreateAccessPoint.md,  https://github.com/ellak-monades-aristeias/thermostatPI/blob/master/doc/README.md |
 | 3 | Δυνατότητα 1 | https://github.com/ellak-monades-aristeias/thermostatPI/blob/master/src/opt/thermostatPi/thermostatPi.py |
 | 4 | Δυνατότητα 2 | https://github.com/ellak-monades-aristeias/thermostatPI/blob/master/src/var/www/config.php, https://github.com/ellak-monades-aristeias/thermostatPI/blob/master/src/var/www/thermostatConfiguration.php, https://github.com/ellak-monades-aristeias/thermostatPI/blob/master/src/var/www/changePassword.php, https://github.com/ellak-monades-aristeias/thermostatPI/blob/master/src/var/www/viewThresholds.php |
 | 5 | Δυνατότητα 3 | https://github.com/ellak-monades-aristeias/thermostatPI/blob/master/src/opt/thermostatPi/thermostatPi.py |
