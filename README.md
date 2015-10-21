@@ -11,21 +11,6 @@ Moreover, the user can se the consumption in hours and set an upper limit per da
 Documentation for [users](README_USERS.md).
 
 Documentation for [developers](README_DEVELOPERS.md).
- 
-# Installation
-
-The installation instructions can be found in the doc folder: [doc/README.md](doc/README.md)
-
-# Hardware
-
-What is needed:
-
-* 1 * Raspberry pi
-* 2 * [DHT22 sensors](https://www.adafruit.com/products/385)
-* 1 * [relay](https://www.sparkfun.com/products/11042)
-* 2 * 4.7K resistance
-* 1 * usb wifi
-* cables
 
 # License
 
