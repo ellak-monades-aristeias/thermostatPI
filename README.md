@@ -16,7 +16,7 @@ Documentation for [developers](README_DEVELOPERS.md).
 
 See: [LICENSE](LICENSE)
 
-# Παραδωτέα
+# Παραδοτέα
 
 
 | Παραδοτέο | Σύντομη περιγραφή | URL |
